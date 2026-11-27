@@ -79,16 +79,19 @@ export const DEFAULT_LAZY_RPC_METHOD_GROUPS: readonly LazyRpcMethodGroup[] = [
   prefixRpcMethodGroup(['mobileRelay.', 'mobileWeb.'], async () => {
     const [
       { MOBILE_RELAY_HOSTS_METHODS },
+      { MOBILE_WORK_BOARD_METHODS },
       { MOBILE_PROJECT_SECTIONS_METHODS },
       { MOBILE_WEB_BUNDLE_METHODS }
     ] = await Promise.all([
       import('./pairing/mobile-relay-hosts'),
+      import('./mobile-delivery/mobile-work-board'),
       import('./mobile-delivery/mobile-project-sections'),
       import('./mobile-delivery/mobile-web-bundle')
     ])
     return [
       ...MOBILE_RELAY_HOSTS_METHODS,
       ...MOBILE_PROJECT_SECTIONS_METHODS,
+      ...MOBILE_WORK_BOARD_METHODS,
       ...MOBILE_WEB_BUNDLE_METHODS
     ]
   }),

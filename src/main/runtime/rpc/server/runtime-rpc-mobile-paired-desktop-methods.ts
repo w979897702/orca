@@ -25,6 +25,7 @@ export const PAIRED_DESKTOP_METHODS = [
   'mobileRelay.hosts.unwatchRows',
   // The sidebar's Project grouping inputs, as the desktop window last published them.
   'mobileRelay.projectSections',
+  'mobileRelay.workBoard',
   'speech.dictation.cancel',
   'speech.dictation.chunk',
   'speech.dictation.finish',

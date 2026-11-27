@@ -38,6 +38,7 @@ import { RECIPE_VM_WAKE_METHODS } from './host-management/recipe-vm-wake'
 import { ENVIRONMENT_DOCTOR_METHODS } from './host-management/environment-doctor'
 import { PAIRING_METHODS } from './pairing/pairing'
 import { MOBILE_RELAY_HOSTS_METHODS } from './pairing/mobile-relay-hosts'
+import { MOBILE_WORK_BOARD_METHODS } from './mobile-delivery/mobile-work-board'
 import { MOBILE_PROJECT_SECTIONS_METHODS } from './mobile-delivery/mobile-project-sections'
 import { MOBILE_WEB_BUNDLE_METHODS } from './mobile-delivery/mobile-web-bundle'
 import { ORCHESTRATION_METHODS } from './orchestration/orchestration'
@@ -132,6 +133,7 @@ const SERVICE_RPC_METHODS = [
   ...PAIRING_METHODS,
   ...MOBILE_RELAY_HOSTS_METHODS,
   ...MOBILE_PROJECT_SECTIONS_METHODS,
+  ...MOBILE_WORK_BOARD_METHODS,
   ...MOBILE_WEB_BUNDLE_METHODS,
   ...ORCHESTRATION_METHODS,
   ...BROWSER_CORE_METHODS,

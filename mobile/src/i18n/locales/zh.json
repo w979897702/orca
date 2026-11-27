@@ -8383,5 +8383,46 @@
       "home": "托管智能体的主聊天无法删除",
       "workerOwed": "仍有编排在等待此聊天"
     }
+  },
+  "workBoard": {
+    "title": "任务中心",
+    "subtitleActive": "{{count}} 项未结束",
+    "subtitleSummary": "{{active}} 项未结束 · 共 {{total}} 项",
+    "loading": "正在加载任务看板…",
+    "emptyTitle": "任务中心暂无任务",
+    "emptyMessage": "当前没有工作项，刷新后可查看最新任务。",
+    "emptyStatus": "暂无「{{status}}」任务",
+    "searchPlaceholder": "搜索编号、标题、分组或仓库",
+    "allGroups": "全部分组",
+    "ungrouped": "未分组",
+    "expandAll": "展开全部",
+    "collapseAll": "收起全部",
+    "offlineTitle": "主机已断开连接",
+    "refreshFailed": "刷新任务失败",
+    "cachedNotice": "当前显示上次同步的数据。",
+    "status": {
+      "todo": "待处理",
+      "in_progress": "执行中",
+      "in_review": "待确认",
+      "pending": "搁置",
+      "done": "已完成",
+      "canceled": "已取消"
+    },
+    "priority": {
+      "urgent": "紧急",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "none": "无优先级"
+    },
+    "detail": {
+      "properties": "任务属性",
+      "id": "编号",
+      "status": "状态",
+      "priority": "优先级",
+      "group": "分组",
+      "repos": "关联仓库",
+      "noRepos": "暂未关联仓库"
+    }
   }
 }

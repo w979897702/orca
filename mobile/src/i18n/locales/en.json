@@ -8530,5 +8530,46 @@
     "workspacesAllButCount": "All but {{count}}",
     "headerMissing": "Fill in {{header}} to add this server.",
     "servers": "Servers"
+  },
+  "workBoard": {
+    "title": "Task Center",
+    "subtitleActive": "{{count}} active",
+    "subtitleSummary": "{{active}} active · {{total}} total",
+    "loading": "Loading board…",
+    "emptyTitle": "No tasks yet",
+    "emptyMessage": "Refresh after creating tasks on desktop.",
+    "emptyStatus": "No {{status}} tasks",
+    "searchPlaceholder": "Search ID, title, group, or repo",
+    "allGroups": "All groups",
+    "ungrouped": "Ungrouped",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "offlineTitle": "Host disconnected",
+    "refreshFailed": "Refresh failed",
+    "cachedNotice": "Showing cached data.",
+    "status": {
+      "todo": "To do",
+      "in_progress": "In progress",
+      "in_review": "In review",
+      "pending": "On hold",
+      "done": "Done",
+      "canceled": "Canceled"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "None"
+    },
+    "detail": {
+      "properties": "Details",
+      "id": "ID",
+      "status": "Status",
+      "priority": "Priority",
+      "group": "Group",
+      "repos": "Repositories",
+      "noRepos": "No repositories"
+    }
   }
 }

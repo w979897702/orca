@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { Pressable, Text, type HostInstance } from 'react-native'
 import {
   CalendarClock,
@@ -35,6 +35,8 @@ import { HostSharedLinksSheet } from './host-shared-links-sheet'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../src/shared/execution-host/execution-host'
 import { MCP_SERVERS_RUNTIME_CAPABILITY } from '../../../src/shared/mcp-servers/mcp-servers'
 import { useRouteCapability } from '../worktree/execution-hosts/use-route-capability'
+
+const HostWorkBoard = lazy(() => import('./work-board/HostWorkBoard'))
 
 function isErrorVerdict(v: ConnectionVerdict): boolean {
   return isConnectionOutage(v) || v.kind === 'auth-failed'
@@ -143,6 +145,7 @@ export function HostScreenHeader({
   } = controller
   const moreRef = useRef<HostInstance>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [boardOpen, setBoardOpen] = useState(false)
   const [sharedLinksOpen, setSharedLinksOpen] = useState(false)
   // The computer's own bot links, once it lists bots; a server's live under that server's account.
   const listsBots = controller.bots.some(
@@ -155,6 +158,13 @@ export function HostScreenHeader({
   const hostPath = `/h/${encodeURIComponent(hostId)}`
 
   const navigationGroup: ActionSheetAction[] = [
+    {
+      id: 'work-board',
+      label: t('workBoard.title', 'Task Center'),
+      icon: List,
+      closeBeforePress: true,
+      onPress: () => setBoardOpen(true)
+    },
     {
       id: 'tasks',
       label: t('hostScreen.hostScreenHeader.tasks', 'Tasks'),
@@ -261,6 +271,20 @@ export function HostScreenHeader({
         groups={[navigationGroup, hostGroup]}
         onClose={() => setMenuOpen(false)}
       />
+      {boardOpen && hostId ? (
+        <Suspense fallback={null}>
+          <HostWorkBoard
+            key={hostId}
+            hostId={hostId}
+            client={controller.client}
+            hostName={hostDisplay.title}
+            connected={!disconnected}
+            authFailed={connState === 'auth-failed'}
+            reconnect={controller.reconnect}
+            onBack={() => setBoardOpen(false)}
+          />
+        </Suspense>
+      ) : null}
       {listsBots ? (
         <HostSharedLinksSheet
           controller={controller}
