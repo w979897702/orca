@@ -4,16 +4,18 @@ import { mobileWorkBoardItem } from '../../../../../shared/work-items/mobile-wor
 import { defineMethod } from '../../core'
 
 const launcher = 'http://127.0.0.1:47837'
-const repositoryRows = lazyZodSchema(() =>
-  z.object({
-    items: z.array(z.object({ id: z.string(), repos: z.array(z.object({ name: z.string() })) }))
-  })
-)
 const displayedBoard = lazyZodSchema(() =>
   z.object({
     items: z.array(
-      mobileWorkBoardItem.omit({ group: true, repos: true }).extend({
+      mobileWorkBoardItem.omit({ group: true, repos: true, modifiedRepos: true }).extend({
         groupName: mobileWorkBoardItem.shape.group,
+        workspaceGitStatus: z
+          .object({
+            repositories: z
+              .array(z.object({ name: z.string(), hasChanges: z.boolean().nullable() }))
+              .optional()
+          })
+          .optional(),
         display: z.object({ status: mobileWorkBoardItem.shape.status }).optional()
       })
     )
@@ -36,28 +38,26 @@ async function readBoard() {
   if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) {
     throw new Error('任务中心地址无效')
   }
-  const [board, repositories] = await Promise.all([
-    fetch(`${origin}/api/work-items`, { redirect: 'error', signal }),
-    fetch(`${launcher}/work-items`, {
-      headers: { 'x-orca-work-board': '1' },
-      redirect: 'error',
-      signal
-    })
-  ])
-  if (!board.ok || !repositories.ok) {
+  const board = await fetch(`${origin}/api/work-items`, { redirect: 'error', signal })
+  if (!board.ok) {
     throw new Error('无法读取电脑上的任务中心看板')
   }
-  const [snapshot, names] = await Promise.all([board.json(), repositories.json()])
-  const repos = new Map(
-    repositoryRows.parse(names).items.map((row) => [row.id, row.repos.map((repo) => repo.name)])
-  )
+  const snapshot = await board.json()
   return {
-    items: displayedBoard.parse(snapshot).items.map(({ groupName, display, ...item }) => ({
-      ...item,
-      group: groupName,
-      status: display?.status ?? item.status,
-      repos: repos.get(item.id) ?? []
-    }))
+    items: displayedBoard
+      .parse(snapshot)
+      .items.map(({ groupName, display, workspaceGitStatus, ...item }) => {
+        const repositories = workspaceGitStatus?.repositories ?? []
+        return {
+          ...item,
+          group: groupName,
+          status: display?.status ?? item.status,
+          repos: repositories.map((repo) => repo.name),
+          modifiedRepos: repositories
+            .filter((repo) => repo.hasChanges === true)
+            .map((repo) => repo.name)
+        }
+      })
   }
 }
 

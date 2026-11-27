@@ -9,7 +9,8 @@ export const mobileWorkBoardItem = lazyZodSchema(() =>
     status: z.enum(['todo', 'in_progress', 'in_review', 'pending', 'done', 'canceled']),
     priority: z.enum(['none', 'low', 'medium', 'high', 'urgent']),
     group: z.string().nullable(),
-    repos: z.array(z.string())
+    repos: z.array(z.string()),
+    modifiedRepos: z.array(z.string()).optional()
   })
 )
 

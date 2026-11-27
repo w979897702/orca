@@ -8387,7 +8387,6 @@
   "workBoard": {
     "title": "任务中心",
     "subtitleActive": "{{count}} 项未结束",
-    "subtitleSummary": "{{active}} 项未结束 · 共 {{total}} 项",
     "loading": "正在加载任务看板…",
     "emptyTitle": "任务中心暂无任务",
     "emptyMessage": "当前没有工作项，刷新后可查看最新任务。",

@@ -8534,7 +8534,6 @@
   "workBoard": {
     "title": "Task Center",
     "subtitleActive": "{{count}} active",
-    "subtitleSummary": "{{active}} active · {{total}} total",
     "loading": "Loading board…",
     "emptyTitle": "No tasks yet",
     "emptyMessage": "Refresh after creating tasks on desktop.",

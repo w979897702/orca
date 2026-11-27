@@ -136,14 +136,26 @@ export function MobileWorkBoardList({
             </Text>
             {visibleRepos.length > 0 ? (
               <View style={styles.repoRow}>
-                {visibleRepos.map((repo) => (
-                  <View key={repo} style={styles.repoChip}>
-                    <GitBranch size={11} color={colors.textMuted} strokeWidth={2.1} />
-                    <Text style={styles.repoText} numberOfLines={1}>
-                      {repo}
-                    </Text>
-                  </View>
-                ))}
+                {visibleRepos.map((repo) => {
+                  const modifiedColor = item.modifiedRepos?.includes(repo)
+                    ? colors.gitDecorationModified
+                    : undefined
+                  return (
+                    <View key={repo} style={styles.repoChip}>
+                      <GitBranch
+                        size={11}
+                        color={modifiedColor ?? colors.textMuted}
+                        strokeWidth={2.1}
+                      />
+                      <Text
+                        style={[styles.repoText, modifiedColor && { color: modifiedColor }]}
+                        numberOfLines={1}
+                      >
+                        {repo}
+                      </Text>
+                    </View>
+                  )
+                })}
                 {overflow > 0 ? (
                   <View style={styles.repoChip}>
                     <Text style={styles.repoText}>{`+${overflow}`}</Text>

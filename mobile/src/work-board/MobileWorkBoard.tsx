@@ -46,12 +46,12 @@ export {
 } from './work-board-model'
 
 const STATUS_ROWS: readonly (readonly MobileWorkBoardStatus[])[] = [
-  ['todo', 'in_progress', 'in_review'],
-  ['pending', 'done', 'canceled']
+  ['todo', 'in_progress'],
+  ['in_review', 'pending']
 ]
 
 export function MobileWorkBoard({
-  items,
+  items: allItems,
   loading,
   error,
   onRefresh,
@@ -70,6 +70,10 @@ export function MobileWorkBoard({
   const [collapsed, setCollapsed] = useState<Record<string, readonly string[]>>({})
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
+  const items = useMemo(
+    () => allItems.filter((item) => item.status !== 'done' && item.status !== 'canceled'),
+    [allItems]
+  )
   const trimmedQuery = query.trim()
   const errorKind = classifyWorkBoardError(error, disconnected)
   const selectedStatus = useMemo(
@@ -147,11 +151,8 @@ export function MobileWorkBoard({
     if (host) {
       return `${host} · ${active}`
     }
-    return t('workBoard.subtitleSummary', '{{active}} active · {{total}} total', {
-      active: projection.activeCount,
-      total: projection.totalCount
-    })
-  }, [host, projection.activeCount, projection.totalCount, t])
+    return active
+  }, [host, projection.activeCount, t])
 
   const statusLabel = workBoardStatusLabel(selectedStatus, t)
   const hasFilters = trimmedQuery.length > 0 || selectedGroup !== undefined

@@ -19,6 +19,7 @@ export type MobileWorkBoardItem = {
   priority: MobileWorkBoardPriority
   group: string | null
   repos: readonly string[]
+  modifiedRepos?: readonly string[]
 }
 
 export type MobileWorkBoardProps = {

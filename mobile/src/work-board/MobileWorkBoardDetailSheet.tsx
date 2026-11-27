@@ -72,14 +72,26 @@ export function MobileWorkBoardDetailSheet({
           />
           {repos.length > 0 ? (
             <View style={styles.repoSurface}>
-              {repos.map((repo) => (
-                <View key={repo} style={styles.repoChip}>
-                  <GitBranch size={12} color={colors.textMuted} strokeWidth={2.1} />
-                  <Text style={styles.repoText} selectable>
-                    {repo}
-                  </Text>
-                </View>
-              ))}
+              {repos.map((repo) => {
+                const modifiedColor = item.modifiedRepos?.includes(repo)
+                  ? colors.gitDecorationModified
+                  : undefined
+                return (
+                  <View key={repo} style={styles.repoChip}>
+                    <GitBranch
+                      size={12}
+                      color={modifiedColor ?? colors.textMuted}
+                      strokeWidth={2.1}
+                    />
+                    <Text
+                      style={[styles.repoText, modifiedColor && { color: modifiedColor }]}
+                      selectable
+                    >
+                      {repo}
+                    </Text>
+                  </View>
+                )
+              })}
             </View>
           ) : (
             <ListGroup>
