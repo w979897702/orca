@@ -241,7 +241,10 @@ function WorktreeListRowComponent({
           delayLongPress={400}
         >
           <View style={styles.indicatorCol}>
-            <AgentSpinner status={status} workingMode={item.workingMode} />
+            <AgentSpinner
+              status={status === 'active' || status === 'done' ? null : status}
+              workingMode={item.workingMode}
+            />
             {item.unread && (
               <Bell
                 size={10}
