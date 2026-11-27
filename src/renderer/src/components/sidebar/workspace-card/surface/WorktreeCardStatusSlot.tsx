@@ -153,6 +153,7 @@ export function WorktreeCardStatusSlot({
   const isReviewStale = reviewStale || Boolean(collectionChecks?.stale)
   const liveStatus = laneStatusWithLineage(useWorktreeActivityStatus(worktreeId), lineageStatus)
   const status = statusOverride ?? liveStatus
+  const activityIconVisibility = status === 'done' || status === 'active' ? 'invisible' : undefined
   // One subscription per card: rows mount by the hundreds, and every listener runs on each store write.
   const { isSleeping, vmRuntime, vmWaking } = useAppStore(
     useShallow((state) => ({
@@ -239,7 +240,12 @@ export function WorktreeCardStatusSlot({
   ) : newCardStyle && showStatus ? (
     <>
       <span className={cn('inline-flex size-5 items-center justify-center', className)}>
-        <StatusIndicator status={status} aria-hidden="true" tooltipSide="right" />
+        <StatusIndicator
+          status={status}
+          aria-hidden="true"
+          className={activityIconVisibility}
+          tooltipSide="right"
+        />
       </span>
       <span className="sr-only">{passiveStatusAnnouncement}</span>
     </>
@@ -248,7 +254,7 @@ export function WorktreeCardStatusSlot({
       <StatusIndicator
         status={status}
         aria-hidden="true"
-        className={className}
+        className={cn(className, activityIconVisibility)}
         tooltipSide="right"
       />
       <span className="sr-only">{statusLabel}</span>
@@ -321,7 +327,12 @@ export function WorktreeCardStatusSlot({
                   {branchStatusIcon}
                 </span>
               ) : showStatus ? (
-                <StatusIndicator status={status} aria-hidden="true" showTooltip={false} />
+                <StatusIndicator
+                  status={status}
+                  aria-hidden="true"
+                  className={activityIconVisibility}
+                  showTooltip={false}
+                />
               ) : (
                 <span className="sr-only">{actionLabel}</span>
               )
@@ -338,7 +349,10 @@ export function WorktreeCardStatusSlot({
                     status={status}
                     aria-hidden="true"
                     showTooltip={false}
-                    className="transition-opacity group-hover/unread:opacity-0 group-focus-within/unread:opacity-0"
+                    className={cn(
+                      'transition-opacity group-hover/unread:opacity-0 group-focus-within/unread:opacity-0',
+                      activityIconVisibility
+                    )}
                   />
                 )}
                 <Bell className="absolute size-3 text-muted-foreground/40 opacity-0 transition-opacity group-hover/unread:opacity-100 group-focus-within/unread:opacity-100" />
