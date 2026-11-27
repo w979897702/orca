@@ -1,4 +1,4 @@
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -69,9 +69,10 @@ async function runFakeUpdater(body: string) {
   const run = runAgentCliUpdate('claude', {}).finally(() => {
     settled = true
   })
-  // Steps the fake clock while the real processes answer in between.
+  // 从更新进程真正启动时计时，避免把版本探测和系统调度耗时算入更新超时。
   await vi.waitFor(
     async () => {
+      expect(existsSync(join(dir, 'pids'))).toBe(true)
       await vi.advanceTimersByTimeAsync(1_000)
       seconds += 1
       expect(settled).toBe(true)
