@@ -1,3 +1,5 @@
+import { recordWorkBoardSession } from '@/components/work-board/work-board-session'
+import { resolveLaunchAgentTabId } from './worktree-creation-agent-seeds'
 import type { TuiAgent } from '../../../../../shared/agent-launch/catalog/tui-agent'
 import { parseExecutionHostId } from '../../../../../shared/execution-host/execution-host'
 import { runtimeEnvironmentIdOrLocalUnlessTwin } from '@/lib/workspace/ownership/worktree-runtime-owner'
@@ -36,6 +38,30 @@ export async function completeWorktreeCreation(args: {
       startupAgent: args.startupAgent,
       backendSpawned: args.backendSpawned
     })
+  }
+  if (request.workBoard && !hostAgentMissing) {
+    const state = useAppStore.getState()
+    const tabId =
+      !args.structuredLaunchAccepted && request.agent
+        ? resolveLaunchAgentTabId(state, {
+            ...args,
+            agent: request.agent,
+            startupTerminalTabId: args.startupTerminalTabId
+          })
+        : args.primaryTabId
+    const tab = tabId ? state.getTab(tabId) : null
+    if (
+      tab?.worktreeId === args.worktreeId &&
+      (tab.contentType === 'agent-session' || tab.contentType === 'terminal')
+    ) {
+      recordWorkBoardSession({
+        ...request.workBoard,
+        kind: tab.contentType === 'terminal' ? 'terminal' : 'chat',
+        sessionId: tab.entityId,
+        worktreeId: args.worktreeId,
+        title: (request.displayName || request.name || tab.label).slice(0, 512)
+      })
+    }
   }
   const paired =
     parseExecutionHostId(request.workspaceRunContext?.hostId ?? request.executionHostId)?.kind ===

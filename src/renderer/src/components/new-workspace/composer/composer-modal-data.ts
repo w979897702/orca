@@ -1,3 +1,4 @@
+import type { WorkBoardTarget } from '../../../../../shared/work-items/work-board-session'
 import type {
   AgentPickerDraft,
   AgentPickerEntry
@@ -13,6 +14,7 @@ import type { TaskSourceContext } from '../../../../../shared/work-items/task-so
 import type { WorkspaceCreationTargetHint } from '@/lib/workspace/creation/project-host-workspace-target'
 
 export type ComposerModalData = {
+  workBoard?: WorkBoardTarget
   recovery?: {
     note: string
     agent: TuiAgent | null

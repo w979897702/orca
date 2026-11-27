@@ -99,6 +99,7 @@ export const TopLevelViewSchema = z
     // Bot templates was a view before it became a dialog; an older peer can still send it.
     'botTemplates',
     'artifacts',
+    'work-board',
     'mobile'
   ])
   .transform((view) => (view === 'botTemplates' ? 'terminal' : view))

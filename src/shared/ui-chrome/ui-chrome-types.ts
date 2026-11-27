@@ -133,4 +133,5 @@ export type TopLevelView =
   | 'space'
   | 'skills'
   | 'artifacts'
+  | 'work-board'
   | 'mobile'

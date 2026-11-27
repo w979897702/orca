@@ -1,3 +1,4 @@
+import type { WorkBoardReceipt } from '../../shared/work-items/work-board-session'
 import { ipcRenderer } from 'electron'
 import type { AppIdentity } from '../../shared/app-lifecycle/identity/app-identity'
 import type { MacosUpgradeSupport } from '../../shared/updater/requirements/macos-upgrade-support'
@@ -28,6 +29,8 @@ export const appApi = {
     ipcRenderer.on('app:profileStateSaveDelayChanged', listener)
     return () => ipcRenderer.removeListener('app:profileStateSaveDelayChanged', listener)
   },
+  linkWorkBoardSession: (receipt: WorkBoardReceipt): Promise<void> =>
+    ipcRenderer.invoke('app:linkWorkBoardSession', receipt),
   getIdentity: (): Promise<AppIdentity> => ipcRenderer.invoke('app:getIdentity'),
   getWindowsAdministratorStatus: (): Promise<boolean | null> =>
     ipcRenderer.invoke('app:getWindowsAdministratorStatus'),

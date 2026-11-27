@@ -235,6 +235,10 @@ export function installMainWindowWebviewSecurity(mainWindow: BrowserWindow): voi
       })
       return
     }
+    // Electron 会把主窗口的 WebRTC 限制传给 webview，本地浏览器标签页需要恢复默认策略。
+    if (browserSessionRegistry.profileIdForSession(guest.session) !== null) {
+      guest.setWebRTCIPHandlingPolicy('default')
+    }
     // Install popup/navigation policy at creation or early redirects/target=_blank can outrun registration.
     browserManager.attachGuestPolicies(guest)
     installBrowserJavaScriptDialogs(guest, () => browserManager.resolvePagePromptTarget(guest))

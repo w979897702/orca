@@ -127,6 +127,13 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
         activeView: state.previousViewBeforeArtifacts,
         worktreeNavHistoryIndex: rewindHistoryIndexPastView(state, 'artifacts')
       })),
+    openWorkBoard: () =>
+      set((state) => ({
+        activeView: 'work-board',
+        previousViewBeforeBoard:
+          state.activeView === 'work-board' ? state.previousViewBeforeBoard : state.activeView
+      })),
+    closeWorkBoard: () => set((state) => ({ activeView: state.previousViewBeforeBoard })),
     openMobilePage: () =>
       set((state) => ({
         activeView: 'mobile',

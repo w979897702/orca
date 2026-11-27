@@ -15,7 +15,7 @@ type SeedRequest = Pick<
 >
 
 /** Find the actual agent tab, never tabs[0] or activation’s primary: default dev/log/shell tabs run no agent. */
-function resolveLaunchAgentTabId(
+export function resolveLaunchAgentTabId(
   state: AppStoreSnapshot,
   args: {
     agent: TuiAgent

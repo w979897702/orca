@@ -23,6 +23,7 @@ export function createUiTaskActions(set: UISliceSet, get: UISliceGet): Partial<U
     previousViewBeforeSkills: 'terminal',
     pendingSkillShareId: null,
     pendingSkillsSharedView: false,
+    previousViewBeforeBoard: 'terminal',
     previousViewBeforeMobile: 'terminal',
     previousViewBeforeArtifacts: 'terminal',
     setActiveView: (view) => set({ activeView: view }),

@@ -1,3 +1,4 @@
+import type { WorkBoardReceipt } from '../../shared/work-items/work-board-session'
 import type { UiLanguageDetection } from '../../shared/i18n/ui-locale'
 import type { WindowMaterial } from '../../shared/app-lifecycle/windows/window-material'
 import type { AppIdentity } from '../../shared/app-lifecycle/identity/app-identity'
@@ -23,6 +24,7 @@ export type AppApi = {
   ) => Promise<UiLanguageDetection | null>
   isProfileStateSaveDelayed: () => Promise<boolean>
   onProfileStateSaveDelayChanged: (callback: (delayed: boolean) => void) => () => void
+  linkWorkBoardSession: (receipt: WorkBoardReceipt) => Promise<void>
   getIdentity: () => Promise<AppIdentity>
   /** Local Windows desktop elevation; null when unavailable. Does not describe remote hosts. */
   getWindowsAdministratorStatus: () => Promise<boolean | null>

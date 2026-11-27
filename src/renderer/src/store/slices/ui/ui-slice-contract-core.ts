@@ -138,6 +138,7 @@ export type UiViewHistory =
   | 'space'
   | 'skills'
   | 'artifacts'
+  | 'work-board'
   | 'mobile'
 
 export type UISliceCore = {
@@ -177,6 +178,7 @@ export type UISliceCore = {
   previousViewBeforeAutomations: Exclude<UiViewHistory, 'automations'>
   previousViewBeforeSpace: Exclude<UiViewHistory, 'space'>
   previousViewBeforeSkills: Exclude<UiViewHistory, 'skills'>
+  previousViewBeforeBoard: Exclude<UiViewHistory, 'work-board'>
   previousViewBeforeMobile: Exclude<UiViewHistory, 'mobile'>
   previousViewBeforeArtifacts: Exclude<UiViewHistory, 'artifacts'>
   setActiveView: (view: UISliceCore['activeView']) => void
@@ -230,6 +232,8 @@ export type UISliceCore = {
   clearPendingSkillsSharedView: () => void
   openArtifactsPage: () => void
   closeArtifactsPage: () => void
+  openWorkBoard: () => void
+  closeWorkBoard: () => void
   openMobilePage: () => void
   closeMobilePage: () => void
   setNewWorkspaceDraft: (draft: NonNullable<UISliceCore['newWorkspaceDraft']>) => void

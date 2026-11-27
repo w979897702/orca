@@ -1,3 +1,4 @@
+import { WORK_BOARD_PANEL } from '../../work-board/work-board-panel'
 import { useMemo } from 'react'
 import { useAppStore } from '@/store'
 import { useRepoById } from '@/store/repos/use-repository-catalog'
@@ -87,7 +88,8 @@ export function useRightSidebarActivityItems({
   const pluginSystemEnabled = useAppStore((s) => s.settings?.pluginSystemEnabled === true)
   const pluginPanels = usePluginPanels()
   const visiblePluginPanels = useMemo(
-    () => (pluginSystemEnabled ? pluginPanels : []),
+    () =>
+      pluginSystemEnabled ? pluginPanels.filter((panel) => panel.tabKey !== WORK_BOARD_PANEL) : [],
     [pluginPanels, pluginSystemEnabled]
   )
   const installedPlugins = usePluginPanelsStore((s) => s.plugins)

@@ -14,6 +14,9 @@ export function createWebAppApi(): Partial<PreloadApi> {
       getMacosUpgradeSupport: () => Promise.resolve('unknown'),
       restartAsAdministrator: () =>
         Promise.reject(new Error('Administrator restart requires the Windows desktop app.')),
+      linkWorkBoardSession: async () => {
+        throw new Error('需要本机 Orca 桌面应用')
+      },
       getIdentity: () =>
         Promise.resolve({
           name: 'Orca',

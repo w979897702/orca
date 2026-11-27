@@ -1,3 +1,4 @@
+import type { WorkBoardTarget } from '../../../../../shared/work-items/work-board-session'
 import type { LaunchAgentStartupPromptPlan } from '@/lib/agent-session/launch/prompt/launch-agent-startup-prompt-plan'
 import type { agentPickerLaunchInputs } from '../../../../../shared/agent-launch/picker/agent-launch-picker'
 import type { ExecutionHostId } from '../../../../../shared/execution-host/execution-host'
@@ -38,6 +39,7 @@ export type WorktreeCreationProgressMode = 'stepped' | 'indeterminate'
 
 /** Session-only creation intent, including script checks and compatibility planning retained for Retry. */
 export type WorktreeCreationRequest = {
+  workBoard?: WorkBoardTarget
   repoId: string
   /** Execution owner retained after script preparation, including retries. */
   executionHostId?: ExecutionHostId

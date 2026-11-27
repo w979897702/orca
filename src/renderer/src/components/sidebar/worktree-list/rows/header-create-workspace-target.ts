@@ -1,3 +1,4 @@
+import type { WorkBoardTarget } from '../../../../../../shared/work-items/work-board-session'
 import type { ProjectHostSetup } from '../../../../../../shared/project/project-types'
 import type { Repo } from '../../../../../../shared/repository/repo-types'
 import {
@@ -32,10 +33,14 @@ export function getHeaderCreateWorkspaceTarget(
 }
 
 /** A project header's Create: the composer seeded with its repo, pinned to its host when its rows all sit there. */
-export function openHeaderCreateComposer(repo: Repo, { pinHost }: { pinHost: boolean }): void {
+export function openHeaderCreateComposer(
+  repo: Repo,
+  { pinHost, workBoard }: { pinHost: boolean; workBoard?: WorkBoardTarget }
+): void {
   const { repos, projectHostSetups, openModal } = useAppStore.getState()
   openModal('new-workspace-composer', {
     initialRepoId: repo.id,
+    ...(workBoard ? { workBoard } : {}),
     ...(pinHost ? getHeaderCreateWorkspaceTarget(repo, repos, projectHostSetups) : {}),
     telemetrySource: 'sidebar'
   })

@@ -1,3 +1,4 @@
+import type { WorkBoardReceipt } from '../../shared/work-items/work-board-session'
 import { getSystemLanguageDetection } from '../i18n/system-language'
 import { setMainUiLanguage } from '../i18n/main-i18n'
 import { rebuildAppMenu } from '../menu/register-app-menu'
@@ -152,6 +153,30 @@ export function registerAppHandlers(store: Store, options: RegisterAppHandlersOp
 
   ipcMain.handle('app:getFeatureWallAssetBaseUrl', (): string => getFeatureWallAssetBaseUrl())
 
+  ipcMain.handle('app:linkWorkBoardSession', async (event, receipt: WorkBoardReceipt) => {
+    if (
+      !isTrustedUIRenderer(event.sender) ||
+      event.senderFrame !== event.sender.mainFrame ||
+      !/^http:\/\/127\.0\.0\.1:\d+$/.test(receipt.origin) ||
+      !/^[a-f0-9-]{36}$/.test(receipt.workId)
+    ) {
+      throw new Error('Work 创建回执无效')
+    }
+    const response = await fetch(
+      `${receipt.origin}/api/work-items/${receipt.workId}/orca-sessions`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-orca-work-board': '1' },
+        body: JSON.stringify(receipt),
+        redirect: 'error',
+        signal: AbortSignal.timeout(5000)
+      }
+    )
+    const result = await response.json()
+    if (!response.ok || result.linked !== true) {
+      throw new Error(result.error?.message || 'Work 会话关联失败')
+    }
+  })
   ipcMain.handle('app:getIdentity', (): AppIdentity => {
     const identity = getDevInstanceIdentity(!app.isPackaged)
     return {

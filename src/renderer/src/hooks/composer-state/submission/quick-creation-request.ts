@@ -1,3 +1,4 @@
+import type { WorkBoardTarget } from '../../../../../shared/work-items/work-board-session'
 import type { AgentStartedTelemetry } from '@/lib/workspace/creation/worktree-startup-payload'
 import type { WorktreeCreationRequest } from '@/lib/workspace/creation/pending-worktree-creation'
 import type { AgentStartupPlan } from '../../../../../shared/agent-launch/startup/tui-agent-startup'
@@ -61,6 +62,7 @@ export type QuickCreationRequestInput = {
 }
 
 export type QuickSubmitOptions = {
+  workBoard?: WorkBoardTarget
   onLegacyPreparationFailure?: (error: unknown) => void
   setupOnly?: boolean
   launchChoice?: AgentLaunchChoice

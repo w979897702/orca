@@ -235,7 +235,17 @@ function QuickTabBody({
     if (createDisabled) {
       return
     }
+    if (
+      modalData.workBoard &&
+      (cardProps.repoId !== modalData.workBoard.repoId ||
+        cardProps.selectedRepoExecutionHostId !== 'local' ||
+        cardProps.selectedProjectId?.startsWith('group:'))
+    ) {
+      toast.error(t('workBoard.projectUnavailable', 'Work project is unavailable'))
+      return
+    }
     await submitQuick(quickAgent, {
+      workBoard: modalData.workBoard,
       // Blank Terminal is the setup-only create: no agent, and no extra shell beside setup.
       setupOnly: quickAgent === null,
       launchChoice: launchSelection.choice,
@@ -278,6 +288,7 @@ function QuickTabBody({
     })
   }, [
     createDisabled,
+    t,
     quickAgent,
     launchSelection.choice,
     submitQuick,

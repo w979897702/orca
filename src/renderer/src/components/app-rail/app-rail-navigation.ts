@@ -14,6 +14,7 @@ type PageCloseActions = Pick<
   | 'closeSettingsPage'
   | 'closeActivityPage'
   | 'closeSpacePage'
+  | 'closeWorkBoard'
   | 'closeMobilePage'
 >
 
@@ -31,6 +32,7 @@ const CLOSE_PAGE: Record<Exclude<UISlice['activeView'], 'terminal'>, keyof PageC
   settings: 'closeSettingsPage',
   activity: 'closeActivityPage',
   space: 'closeSpacePage',
+  'work-board': 'closeWorkBoard',
   mobile: 'closeMobilePage'
 }
 

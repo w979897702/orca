@@ -245,6 +245,10 @@ export function useQuickCreationExecution(input: QuickCreationExecutionInput) {
         return
       }
 
+      if (options?.workBoard && options.workBoard.repoId === repoId && !ephemeralVmRecipe) {
+        request.workBoard = options.workBoard
+      }
+
       if (persistDraft) {
         clearNewWorkspaceDraft()
       }

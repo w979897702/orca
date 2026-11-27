@@ -1,5 +1,13 @@
 import React from 'react'
-import { BookOpen, CalendarClock, EyeOff, Files, Search, Smartphone } from 'lucide-react'
+import {
+  BookOpen,
+  CalendarClock,
+  EyeOff,
+  Files,
+  PanelsTopLeft,
+  Search,
+  Smartphone
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/store/index'
 import { cn } from '@/lib/class-names'
@@ -54,6 +62,8 @@ const AgentDashboardSidebarEntry = lazyWithRetry(
 
 const SidebarNav = React.memo(function SidebarNav() {
   const t = useTranslate()
+  const openWorkBoard = useAppStore((s) => s.openWorkBoard)
+  const boardActive = useAppStore((s) => s.activeView === 'work-board')
   const botsEnabled = useBotsEnabled()
   // Subscribe across this memo boundary; translate still handles pseudo-localization.
   useTranslation()
@@ -128,6 +138,20 @@ const SidebarNav = React.memo(function SidebarNav() {
             />
           ))}
         </span>
+      </button>
+      <button
+        type="button"
+        onClick={openWorkBoard}
+        aria-current={boardActive ? 'page' : undefined}
+        className={cn(
+          'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] font-medium tracking-tight transition-colors',
+          boardActive
+            ? 'bg-worktree-sidebar-accent text-worktree-sidebar-accent-foreground'
+            : 'text-worktree-sidebar-foreground/60 hover:bg-worktree-sidebar-foreground/8'
+        )}
+      >
+        <PanelsTopLeft className="size-4 shrink-0" strokeWidth={boardActive ? 2.25 : 1.75} />
+        {t('workBoard.title', 'Control Center')}
       </button>
       <SetupGuideSidebarEntry />
       {appRailVisible ? null : <SidebarTaskNavButton />}
