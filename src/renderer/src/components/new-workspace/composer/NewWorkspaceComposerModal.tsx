@@ -187,7 +187,7 @@ function QuickTabBody({
     choicePending
   )
   // An explicit pick stays valid where it opens as a chat without its CLI.
-  const resolvedQuickAgentSelection = resolveQuickWorkspaceAgentSelection({
+  const { quickAgent, quickAgentOverride: nextOverride } = resolveQuickWorkspaceAgentSelection({
     quickAgentOverride,
     preferredQuickAgent,
     detectedAgentIds: cardProps.detectedAgentIds,
@@ -195,11 +195,10 @@ function QuickTabBody({
     selectedChoiceUnresolved: Boolean(quickAgentOverride && choicePending(quickAgentOverride)),
     disabledTuiAgents
   })
-  if (resolvedQuickAgentSelection.quickAgentOverride !== quickAgentOverride) {
+  if (nextOverride !== quickAgentOverride) {
     // Repair invalid picks before children render an unavailable option.
-    setQuickAgentOverride(resolvedQuickAgentSelection.quickAgentOverride)
+    setQuickAgentOverride(nextOverride)
   }
-  const quickAgent = resolvedQuickAgentSelection.quickAgent
   const chipAgentIds =
     offeredAgentIds &&
     new Set([...offeredAgentIds, ...(quickAgent && choicePending(quickAgent) ? [quickAgent] : [])])
