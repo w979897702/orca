@@ -1,5 +1,5 @@
-import { app, powerMonitor } from 'electron'
-import type { BrowserWindow } from 'electron'
+import { officialAppUpdatesEnabled } from '../../../shared/updater/official-app-updates'
+import { app, powerMonitor, type BrowserWindow } from 'electron'
 import type { ReleaseBuild, ReleaseChannel } from '../../../shared/updater/release-channel'
 import type { ReleaseBuildListOptions } from '../releases/updater-release-build-cache'
 import {
@@ -170,7 +170,7 @@ export class UpdaterSetup extends UpdaterDownloadInstall {
       this.sendErrorStatus(`The server update did not complete: ${serveHandoffFailure}`, true)
     }
 
-    if (!app.isPackaged) {
+    if (!officialAppUpdatesEnabled || !app.isPackaged) {
       return
     }
 

@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../shared/updater/official-app-updates'
 import { BrowserWindow, Menu, app } from 'electron'
 import { formatKeybindingList } from '../../shared/keybindings/formatting'
 import { getEffectiveKeybindingsForAction } from '../../shared/keybindings/effective'
@@ -94,6 +95,7 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   }
 
   const checkForUpdatesItem: Electron.MenuItemConstructorOptions = {
+    visible: officialAppUpdatesEnabled,
     label: translateMain('menu.checkForUpdates', 'Check for Updates...'),
     click: checkForUpdatesClick
   }

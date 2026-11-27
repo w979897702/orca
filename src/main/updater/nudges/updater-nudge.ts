@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../../shared/updater/official-app-updates'
 import { app } from 'electron'
 import { fetchNudge, shouldApplyNudge } from './nudge-campaign'
 import { NUDGE_ACTIVATION_COOLDOWN_MS, NUDGE_POLL_INTERVAL_MS } from '../lifecycle/updater-state'
@@ -5,7 +6,7 @@ import { UpdaterBuildSelection } from '../releases/updater-build-selection'
 
 export abstract class UpdaterNudge extends UpdaterBuildSelection {
   protected async checkForUpdateNudge(): Promise<void> {
-    if (!app.isPackaged) {
+    if (!officialAppUpdatesEnabled || !app.isPackaged) {
       return
     }
     if (this.nudgeCheckInFlight) {

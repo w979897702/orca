@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../shared/updater/official-app-updates'
 import { Menu, Tray, nativeImage, nativeTheme, type NativeImage } from 'electron'
 import menuBarIconPath from '../../../resources/tray/orca-menu-barTemplate.png?asset&asarUnpack'
 import menuBarIconRetinaPath from '../../../resources/tray/orca-menu-barTemplate@2x.png?asset&asarUnpack'
@@ -262,6 +263,7 @@ function buildTrayMenu(opts: SystemTrayOptions): Menu {
             click: safeMenuAction(() => opts.onOpenSettings())
           },
           {
+            visible: officialAppUpdatesEnabled,
             label: translateMain('menu.checkForUpdates', 'Check for Updates...'),
             click: safeMenuAction(() => opts.onCheckForUpdates())
           },

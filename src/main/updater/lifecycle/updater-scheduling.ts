@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../../shared/updater/official-app-updates'
 import { app } from 'electron'
 import { isMacInstallRequested } from '../mac-install/updater-mac-install'
 import { withUpdaterSpan } from '../../observability/instrumentation'
@@ -75,7 +76,7 @@ export abstract class UpdaterScheduling extends UpdaterCheckFailure {
     ) {
       return false
     }
-    if (!app.isPackaged) {
+    if (!officialAppUpdatesEnabled || !app.isPackaged) {
       this.sendStatus({ state: 'not-available' })
       return false
     }

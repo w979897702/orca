@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../../../../shared/updater/official-app-updates'
 import { getUpdateInstallBlockGuidance } from '../../maintenance/update-card/update-install-block-guidance'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -86,6 +87,18 @@ export function GeneralUpdateSettingsSection({
         )
       }
     })
+  }
+
+  if (!officialAppUpdatesEnabled) {
+    return (
+      <SettingsGroup title={t('settings.general.about.title', 'About')}>
+        <span className="text-sm">
+          {t('settings.general.about.version', 'Orca {{version}}', { version: appVersion ?? '…' })}
+        </span>
+        <GeneralRemoteServerUpdates />
+        {children}
+      </SettingsGroup>
+    )
   }
 
   return (

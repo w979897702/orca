@@ -1,3 +1,4 @@
+import { officialAppUpdatesEnabled } from '../../../../../shared/updater/official-app-updates'
 import { DiscordIcon } from '../../icons/DiscordIcon'
 import React, { useState } from 'react'
 import {
@@ -254,20 +255,24 @@ export function useHelpMenuController(
           <ExternalLink className="ml-auto size-3 text-muted-foreground" />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          disabled={updateStatus.state === 'checking' || updateStatus.state === 'downloading'}
-          onPointerDown={handleCheckForUpdatesPointerDown}
-          onSelect={handleCheckForUpdates}
-          title={updateCheckHint}
-        >
-          {updateStatus.state === 'checking' ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <RefreshCw className="size-3.5" />
-          )}
-          {t('auto.components.sidebar.SidebarSettingsHelpMenu.29c56f30ee', 'Check for Updates')}
-        </DropdownMenuItem>
-        {innerSeparator}
+        {officialAppUpdatesEnabled && (
+          <>
+            <DropdownMenuItem
+              disabled={updateStatus.state === 'checking' || updateStatus.state === 'downloading'}
+              onPointerDown={handleCheckForUpdatesPointerDown}
+              onSelect={handleCheckForUpdates}
+              title={updateCheckHint}
+            >
+              {updateStatus.state === 'checking' ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="size-3.5" />
+              )}
+              {t('auto.components.sidebar.SidebarSettingsHelpMenu.29c56f30ee', 'Check for Updates')}
+            </DropdownMenuItem>
+            {innerSeparator}
+          </>
+        )}
         <DropdownMenuItem onSelect={handleRestartOrca} disabled={isRestartingOrca}>
           <RotateCw className="size-3.5" />
           {t('auto.components.sidebar.SidebarSettingsHelpMenu.ad3d3ed7f1', 'Restart Orca')}
