@@ -174,8 +174,7 @@ export function connectMobileRelayRpcSession(args: {
   const livenessWatchdog = new RpcSessionLivenessWatchdog({
     transport: 'relay',
     // A link silent past the request timeout carries no reply the phone still awaits.
-    isLinkBusy: (framesArrived, silentMs) =>
-      framesArrived || (silentMs < requestTimeoutMs && pending.hasWritten()),
+    isLinkBusy: (silentMs) => silentMs < requestTimeoutMs && pending.hasWritten(),
     idleProbeMs: 15_000,
     probeTimeoutMs: 4_000,
     missedProbeLimit: 2,
