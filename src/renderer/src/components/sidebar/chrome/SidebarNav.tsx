@@ -151,7 +151,7 @@ const SidebarNav = React.memo(function SidebarNav() {
         )}
       >
         <PanelsTopLeft className="size-4 shrink-0" strokeWidth={boardActive ? 2.25 : 1.75} />
-        {t('workBoard.title', 'Control Center')}
+        {t('workBoard.title', 'Task Center')}
       </button>
       <SetupGuideSidebarEntry />
       {appRailVisible ? null : <SidebarTaskNavButton />}
