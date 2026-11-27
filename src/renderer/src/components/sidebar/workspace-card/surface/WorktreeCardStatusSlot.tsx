@@ -84,7 +84,8 @@ export function getUnreadToggleTooltip(isUnread: boolean): string {
 
 export function overlayNewCardUnreadStatus(
   status: React.JSX.Element,
-  showUnreadAlert: boolean
+  showUnreadAlert: boolean,
+  position: 'corner' | 'center' = 'corner'
 ): React.JSX.Element {
   if (!showUnreadAlert) {
     return status
@@ -96,7 +97,11 @@ export function overlayNewCardUnreadStatus(
       className="relative inline-flex size-5 shrink-0 items-center justify-center"
     >
       {status}
-      <span data-worktree-unread-alert="" className={unreadAlertDotClassName} aria-hidden="true" />
+      <span
+        data-worktree-unread-alert=""
+        className={cn(unreadAlertDotClassName, position === 'center' && 'inset-0 m-auto')}
+        aria-hidden="true"
+      />
     </span>
   )
 }
@@ -153,7 +158,8 @@ export function WorktreeCardStatusSlot({
   const isReviewStale = reviewStale || Boolean(collectionChecks?.stale)
   const liveStatus = laneStatusWithLineage(useWorktreeActivityStatus(worktreeId), lineageStatus)
   const status = statusOverride ?? liveStatus
-  const activityIconVisibility = status === 'done' || status === 'active' ? 'invisible' : undefined
+  const hideActivityDot = status === 'done' || status === 'active'
+  const activityIconVisibility = hideActivityDot ? 'invisible' : undefined
   // One subscription per card: rows mount by the hundreds, and every listener runs on each store write.
   const { isSleeping, vmRuntime, vmWaking } = useAppStore(
     useShallow((state) => ({
@@ -282,7 +288,13 @@ export function WorktreeCardStatusSlot({
   }
 
   if (!unreadActionEnabled) {
-    return overlayNewCardUnreadStatus(passiveStatus, showNewCardUnreadAlert)
+    const standaloneUnread =
+      hideActivityDot && !canShowSleepingStatus && !canShowReviewStatus && !canShowBranchStatus
+    return overlayNewCardUnreadStatus(
+      passiveStatus,
+      showNewCardUnreadAlert,
+      standaloneUnread ? 'center' : 'corner'
+    )
   }
 
   const actionLabel = isUnread
