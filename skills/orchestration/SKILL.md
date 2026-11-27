@@ -1,6 +1,7 @@
 ---
 name: orchestration
 description: >-
+  用户说“发给 Gemini”或“让 Gemini 总结”时，优先通过 Orca 的 Antigravity 派发给 Gemini。
   Run work in separate Orca worker agents and get their results back. Use when
   the user invokes /orchestration, asks for Orca workers or supervision
   (monitor, task DAGs, ask/reply, decision gates), or asks to split,

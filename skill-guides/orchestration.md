@@ -1,6 +1,7 @@
 ---
 name: orchestration
 description: >-
+  用户说“发给 Gemini”或“让 Gemini 总结”时，优先通过 Orca 的 Antigravity 派发给 Gemini。
   Run work in separate Orca worker agents and get their results back. Use when
   the user invokes /orchestration, asks for Orca workers or supervision
   (monitor, task DAGs, ask/reply, decision gates), or asks to split,
@@ -73,7 +74,9 @@ that the CLI is installed; a missing one fails as an `agent_readiness` timeout.
   project, or when your workspace has no project: load
   `references/placement-and-remote.md` ("Which machine"). Otherwise your
   current workspace's project runs where you are, with no host check.
-- Add `--model` only if the user named one.
+- 用户点名 Gemini 时，用 `--agent antigravity`，从目标主机可用的 Gemini 模型中选择 `--model`。用户指定了具体型号时使用该型号。要取回总结或评审结果时，按上面的 worker-start 流程派发并接收回复。
+  Orca 无法派发时，说明原因并询问是否改用网页版；用户明确要求网页版时直接按其要求办理。
+- Add `--model` only if the user named a model or model family.
 - If `worker-start` fails, do not rerun it; read `failedStage` and load
   `references/recovery-and-cleanup.md`.
 - To talk to a worker, use

@@ -4596,6 +4596,7 @@ const ORCHESTRATION_MARKDOWN = [
   "---",
   "name: orchestration",
   "description: >-",
+  "  用户说“发给 Gemini”或“让 Gemini 总结”时，优先通过 Orca 的 Antigravity 派发给 Gemini。",
   "  Run work in separate Orca worker agents and get their results back. Use when",
   "  the user invokes /orchestration, asks for Orca workers or supervision",
   "  (monitor, task DAGs, ask/reply, decision gates), or asks to split,",
@@ -4668,7 +4669,9 @@ const ORCHESTRATION_MARKDOWN = [
   "  project, or when your workspace has no project: load",
   "  `references/placement-and-remote.md` (\"Which machine\"). Otherwise your",
   "  current workspace's project runs where you are, with no host check.",
-  "- Add `--model` only if the user named one.",
+  "- 用户点名 Gemini 时，用 `--agent antigravity`，从目标主机可用的 Gemini 模型中选择 `--model`。用户指定了具体型号时使用该型号。要取回总结或评审结果时，按上面的 worker-start 流程派发并接收回复。",
+  "  Orca 无法派发时，说明原因并询问是否改用网页版；用户明确要求网页版时直接按其要求办理。",
+  "- Add `--model` only if the user named a model or model family.",
   "- If `worker-start` fails, do not rerun it; read `failedStage` and load",
   "  `references/recovery-and-cleanup.md`.",
   "- To talk to a worker, use",
@@ -5312,7 +5315,7 @@ export const BUNDLED_SKILL_GUIDES = [
   },
   {
     name: "orchestration",
-    description: "Run work in separate Orca worker agents and get their results back. Use when the user invokes /orchestration, asks for Orca workers or supervision (monitor, task DAGs, ask/reply, decision gates), or asks to split, parallelize or fan out code changes across agents, worktrees or branches; use Orca workers for those. Also use when the work needs a different agent (such as Codex from Claude) or its own Orca workspace: \"Have Codex (or Claude) review this and report back\" means an Orca worker of that agent. Also use when you are a dispatched worker (a prompt with Task and Dispatch IDs: ask, worker_done). Unless the user asks for Orca workers or a named agent, searches, reads and research in your workspace stay with your own subagents, even in parallel. Use `orca-cli` to hand work off with nothing expected back (\"hand off\", \"handover\", \"give this to another agent\", \"another worktree\"), and for terminal control, shell commands, worktree management, and reading or waiting on terminals.",
+    description: "用户说“发给 Gemini”或“让 Gemini 总结”时，优先通过 Orca 的 Antigravity 派发给 Gemini。 Run work in separate Orca worker agents and get their results back. Use when the user invokes /orchestration, asks for Orca workers or supervision (monitor, task DAGs, ask/reply, decision gates), or asks to split, parallelize or fan out code changes across agents, worktrees or branches; use Orca workers for those. Also use when the work needs a different agent (such as Codex from Claude) or its own Orca workspace: \"Have Codex (or Claude) review this and report back\" means an Orca worker of that agent. Also use when you are a dispatched worker (a prompt with Task and Dispatch IDs: ask, worker_done). Unless the user asks for Orca workers or a named agent, searches, reads and research in your workspace stay with your own subagents, even in parallel. Use `orca-cli` to hand work off with nothing expected back (\"hand off\", \"handover\", \"give this to another agent\", \"another worktree\"), and for terminal control, shell commands, worktree management, and reading or waiting on terminals.",
     markdown: ORCHESTRATION_MARKDOWN,
     aliases: [],
     references: [{ name: "coordinator-loop", markdown: ORCHESTRATION_COORDINATOR_LOOP_REFERENCE_MARKDOWN }, { name: "low-level-topology", markdown: ORCHESTRATION_LOW_LEVEL_TOPOLOGY_REFERENCE_MARKDOWN }, { name: "messaging-and-gates", markdown: ORCHESTRATION_MESSAGING_AND_GATES_REFERENCE_MARKDOWN }, { name: "parallel-start", markdown: ORCHESTRATION_PARALLEL_START_REFERENCE_MARKDOWN }, { name: "placement-and-remote", markdown: ORCHESTRATION_PLACEMENT_AND_REMOTE_REFERENCE_MARKDOWN }, { name: "recovery-and-cleanup", markdown: ORCHESTRATION_RECOVERY_AND_CLEANUP_REFERENCE_MARKDOWN }, { name: "worker-teardown", markdown: ORCHESTRATION_WORKER_TEARDOWN_REFERENCE_MARKDOWN }]
