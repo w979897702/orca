@@ -182,7 +182,13 @@ export function MobileSessionActiveContent({
           onCopy={(text) => void copyMarkdownText(text)}
           onDiscard={() => discardMarkdownLocalContent(activeMarkdownTab)}
           loadImageSource={(path) =>
-            loadMarkdownPreviewImage(client, worktreeId, activeMarkdownTab.relativePath, path)
+            loadMarkdownPreviewImage(
+              controller.connState === 'connected' ? client : null,
+              worktreeId,
+              activeMarkdownTab.relativePath,
+              path,
+              JSON.stringify([hostId, executionHost])
+            )
           }
           keyboardLift={keyboardLift}
         />

@@ -1,3 +1,4 @@
+import { cachedAccountUsage } from './cached-account-usage'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { hashKey, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AccountsSnapshotError, decodeAccountsSnapshot } from './accounts-snapshot'
@@ -9,23 +10,24 @@ import type { RpcClient } from '../transport/rpc/rpc-client-contract'
 import {
   accountsSnapshotKey,
   accountsSnapshotOptions,
-  subscribeAccountsSnapshots,
-  withoutAccountUsage
+  subscribeAccountsSnapshots
 } from './accounts-snapshot-stream'
 
 /**
  * One host's accounts: the last stored snapshot at once, then the desktop's stream, or `accounts.list` when the
- * stream fails. Usage shows only from a read on the current connection; anything older shows accounts alone.
+ * stream fails. 缓存额度只用于展示；切换账号和重置额度仍需本次连接确认。
  */
 export function useMobileAccountsSnapshot({
   hostId,
   client,
   connState,
-  lastConnectedAt
+  lastConnectedAt,
+  now
 }: {
   hostId: string
   client: RpcClient | null
   connState: ConnectionState
+  now: number
   lastConnectedAt: number | null
 }) {
   const t = useMobileTranslation()
@@ -100,8 +102,7 @@ export function useMobileAccountsSnapshot({
     })
   }, [acceptSnapshot, client, connState, refresh, rejectInvalidSnapshot])
 
-  // Only this screen's own read on the current connection shows usage. A stored snapshot never does, whatever its
-  // date: native Home writes it from its own stream, possibly after this connect or on a clock since set back.
+  // 只有当前连接的实时读数才能启用账号操作。
   const live =
     data != null &&
     !holdsRestoredHostQueryData(queryClient, hashKey(accountsSnapshotKey(hostId))) &&
@@ -109,8 +110,8 @@ export function useMobileAccountsSnapshot({
     lastConnectedAt !== null &&
     dataUpdatedAt >= Math.max(lastConnectedAt, mountedAt)
   const snapshot = useMemo(
-    () => (live ? (data ?? null) : withoutAccountUsage(data ?? null)),
-    [live, data]
+    () => (live ? (data ?? null) : cachedAccountUsage(data ?? null, now)),
+    [live, data, now]
   )
 
   const error =
@@ -119,7 +120,13 @@ export function useMobileAccountsSnapshot({
   return {
     snapshot,
     live,
-    readAt: data != null ? dataUpdatedAt : null,
+    readAt: snapshot
+      ? Math.min(
+          dataUpdatedAt,
+          snapshot.rateLimits.claude?.updatedAt ?? dataUpdatedAt,
+          snapshot.rateLimits.codex?.updatedAt ?? dataUpdatedAt
+        )
+      : null,
     error,
     refreshing,
     refresh,

@@ -1,3 +1,4 @@
+import { cachedAccountUsage } from '../../accounts/cached-account-usage'
 import { Gauge, RefreshCw } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
@@ -46,7 +47,7 @@ export function MobileHomeUsageTab(props: {
   hosts: readonly HostProfile[]
   connectedHosts: readonly HostProfile[]
   hostStates: Record<string, ConnectionState>
-  accountsByHost: Record<string, AccountsSnapshot>
+  accountsByHost: Record<string, { snapshot: AccountsSnapshot; live: boolean }>
   stats: HomeStatsSummary | null
   bottomInset: number
   onOpenAccounts: (hostId: string) => void
@@ -129,7 +130,7 @@ export function MobileHomeUsageTab(props: {
 function HostUsage(props: {
   host: HostProfile
   connected: boolean
-  snapshot: AccountsSnapshot | null
+  snapshot: { snapshot: AccountsSnapshot; live: boolean } | null
   first: boolean
   onOpenAccounts: (hostId: string) => void
 }) {
@@ -140,11 +141,15 @@ function HostUsage(props: {
   const reducedMotion = useReducedMotionEnabled() === true
   const desktop = useHostDisplay(props.host).title
   // Why: the reset countdowns and "Updated" note only flip on minute boundaries.
-  const now = useNow(60_000, props.connected)
+  const now = useNow(60_000, Boolean(props.snapshot))
   // The tab's first desktop appears in place; only a switch to another one fades in.
   const [initialHostId] = useState(props.host.id)
 
-  if (!props.connected) {
+  const snapshot =
+    props.snapshot?.live && props.connected
+      ? props.snapshot.snapshot
+      : cachedAccountUsage(props.snapshot?.snapshot ?? null, now)
+  if (!props.connected && !(snapshot?.rateLimits.claude || snapshot?.rateLimits.codex)) {
     return (
       <UsageEmpty
         message={t('home.usage.connectDesktop', 'Connect {{desktop}} to see agent account usage.', {
@@ -153,14 +158,14 @@ function HostUsage(props: {
       />
     )
   }
-  if (!props.snapshot) {
+  if (!snapshot) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="small" color={colors.textSecondary} />
       </View>
     )
   }
-  const sections = selectHomeUsageSections(props.snapshot)
+  const sections = selectHomeUsageSections(snapshot)
   if (sections.length === 0) {
     return (
       <UsageEmpty

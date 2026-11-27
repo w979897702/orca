@@ -1,3 +1,4 @@
+import { cachedAccountUsage } from './cached-account-usage'
 import { queryOptions, skipToken } from '@tanstack/react-query'
 import { AccountsSnapshotSchema, decodeAccountsSnapshot } from './accounts-snapshot'
 import type { AccountsSnapshot } from './accounts-snapshot'
@@ -5,32 +6,13 @@ import { hostQueryKey, type HostQueryKey } from '../query/host-query-key'
 import type { PersistedHostFamily } from '../query/host-query-persistence'
 import type { RpcClient } from '../transport/rpc/rpc-client-contract'
 
-/** Usage and rate limits are live facts: a stored snapshot keeps the accounts and drops every number. */
-export function withoutAccountUsage(snapshot: AccountsSnapshot | null): AccountsSnapshot | null {
-  if (!snapshot) {
-    return null
-  }
-  const { claudeTarget, codexTarget } = snapshot.rateLimits
-  return {
-    ...snapshot,
-    rateLimits: {
-      claude: null,
-      codex: null,
-      claudeTarget,
-      codexTarget,
-      inactiveClaudeAccounts: [],
-      inactiveCodexAccounts: []
-    }
-  }
-}
-
 /** A host's last `accounts.subscribe` snapshot; null when the desktop sent one this phone can't read. */
 export const accountsSnapshotFamily: PersistedHostFamily<AccountsSnapshot | null> = {
   family: 'accounts.snapshot',
   persist: {
     version: 1,
     dataSchema: AccountsSnapshotSchema.nullable(),
-    strip: withoutAccountUsage
+    strip: cachedAccountUsage
   }
 }
 

@@ -1,6 +1,8 @@
+import { holdsRestoredHostQueryData } from '../query/host-query-persistence'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  hashKey,
   notifyManager,
   replaceEqualDeep,
   useQueries,
@@ -15,7 +17,7 @@ import {
   type AgentListInput
 } from '../agents/agent-list-rows'
 import { useAgentActivityWrites } from '../agents/use-agent-activity-writes'
-import { accountsSnapshotOptions } from '../accounts/accounts-snapshot-stream'
+import { accountsSnapshotOptions, accountsSnapshotKey } from '../accounts/accounts-snapshot-stream'
 import type { AccountsSnapshot } from '../accounts/accounts-snapshot'
 import {
   HOST_LIST_TARGET,
@@ -145,23 +147,27 @@ export function useMobileHomeData() {
     () => homeHosts.map(({ hostId }) => accountsSnapshotOptions(hostId)),
     [homeHosts]
   )
-  // Usage is live: only a snapshot from this connection shows, never a stored or disconnected one.
+  // 离线快照只用来展示上次已确认账号的额度。
   const combineAccounts = useCallback(
-    (results: QueryObserverResult<AccountsSnapshot | null>[]): Record<string, AccountsSnapshot> => {
-      const byHost: Record<string, AccountsSnapshot> = {}
+    (
+      results: QueryObserverResult<AccountsSnapshot | null>[]
+    ): Record<string, { snapshot: AccountsSnapshot; live: boolean }> => {
+      const byHost: Record<string, { snapshot: AccountsSnapshot; live: boolean }> = {}
       homeHosts.forEach(({ hostId }, at) => {
         const result = results[at]
-        if (
-          result?.data &&
-          hostStates[hostId] === 'connected' &&
-          isLive(hostId, result.dataUpdatedAt)
-        ) {
-          byHost[hostId] = result.data
+        if (result?.data && hostStates[hostId] !== 'auth-failed') {
+          byHost[hostId] = {
+            snapshot: result.data,
+            live:
+              hostStates[hostId] === 'connected' &&
+              isLive(hostId, result.dataUpdatedAt) &&
+              !holdsRestoredHostQueryData(queryClient, hashKey(accountsSnapshotKey(hostId)))
+          }
         }
       })
       return byHost
     },
-    [homeHosts, hostStates, isLive]
+    [homeHosts, hostStates, isLive, queryClient]
   )
   const accountsByHost = useQueries({
     queries: accountsQueries,

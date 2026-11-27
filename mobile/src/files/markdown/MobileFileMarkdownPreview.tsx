@@ -12,6 +12,7 @@ import { filePreviewStylesSheet } from '../preview/mobile-file-preview-styles'
 import { useThemedStyles } from '../../theme/themed-styles'
 
 type Props = {
+  hostScope: string
   mode: MarkdownPreviewMode
   relativePath: string
   content: string
@@ -24,6 +25,7 @@ type Props = {
 }
 
 export function MobileFileMarkdownPreview({
+  hostScope,
   mode,
   relativePath,
   content,
@@ -47,6 +49,7 @@ export function MobileFileMarkdownPreview({
             ? (href, alt) => (
                 <MobileMarkdownPreviewImage
                   key={`${worktreeId}:${relativePath}:${href}`}
+                  hostScope={hostScope}
                   client={client ?? null}
                   worktreeId={worktreeId}
                   documentPath={relativePath}

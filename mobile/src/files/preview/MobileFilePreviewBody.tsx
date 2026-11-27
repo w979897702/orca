@@ -21,6 +21,8 @@ import { useMobileTranslation } from '../../i18n/use-mobile-translation'
 import { useThemedStyles } from '../../theme/themed-styles'
 
 type Props = {
+  imageHostScope: string
+  imageOnline: boolean
   preview: MobileFilePreviewResult
   client?: MobileFilePreviewRpcSender | null
   worktreeId?: string
@@ -87,7 +89,8 @@ export function MobileFilePreviewBody({ preview, ...options }: Props) {
       <MobileFileMarkdownPreview
         mode={options.markdownMode}
         relativePath={options.relativePath}
-        client={options.client}
+        hostScope={options.imageHostScope}
+        client={options.imageOnline ? options.client : null}
         worktreeId={options.worktreeId}
         content={preview.content}
         truncated={preview.truncated}

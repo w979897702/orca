@@ -9,7 +9,7 @@ import { decodeBase64Bytes } from '../../transport/encryption/base64-byte-codec'
 export const MOBILE_MEDIA_CHUNK_BYTES = 384 * 1024
 export const MOBILE_MEDIA_MAX_BYTES = 256 * 1024 * 1024
 
-const statRead = bindDeferredRpcOperation(
+export const mobileFileStatRead = bindDeferredRpcOperation(
   defineRpcOperation({
     name: 'files.media-preview-stat',
     method: 'files.stat',
@@ -71,14 +71,14 @@ export async function downloadMobileFileMedia(
   const options = { failWhenDisconnected: true, timeoutMs: 30_000 }
   try {
     checkDownloadActive(signal)
-    const statReply = await statRead.request(client, params, options)
+    const statReply = await mobileFileStatRead.request(client, params, options)
     if (
       !statReply.ok &&
       isMobileMethodUnavailableError(statReply.error.code, statReply.error.message)
     ) {
       throw new MobileMediaHostOutdatedError()
     }
-    const stat = statRead.interpret(statReply)
+    const stat = mobileFileStatRead.interpret(statReply)
     checkDownloadActive(signal)
     if (stat.isDirectory || stat.size === 0) {
       throw new Error('This file has no playable media')
@@ -107,7 +107,9 @@ export async function downloadMobileFileMedia(
       offset += chunk.bytesRead
       onProgress(offset, stat.size)
     }
-    const latest = statRead.interpret(await statRead.request(client, params, options))
+    const latest = mobileFileStatRead.interpret(
+      await mobileFileStatRead.request(client, params, options)
+    )
     checkDownloadActive(signal)
     if (
       latest.isDirectory ||

@@ -1,3 +1,7 @@
+import {
+  primeStoredChatTranscripts,
+  storedTabChatTranscriptIdentity
+} from '../native-chat/transcript/persistence/mobile-native-chat-transcript-store'
 import { keepsTerminalPaneVisible } from '../../terminal/session/pane-layout/mobile-terminal-pane-layout'
 import { useCallback } from 'react'
 import { STARTUP_CWD_FALLBACK_SENTENCE } from '../../../../src/shared/shell/launch/startup-cwd-fallback'
@@ -12,6 +16,9 @@ import type { MobileSessionKeyboardStateModel } from '../../terminal/session/inp
 export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateModel) {
   const {
     worktreeId,
+    hostId,
+    nativeChatTranscriptIsLocalReadable,
+    nativeChatController: { isTabChatView },
     client,
     sessionTabs,
     setActiveHandle,
@@ -106,6 +113,17 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
       if (isCachedActiveDocumentRetap(tab, activeSessionTabId, { markdownDocs, fileDocs })) {
         return
       }
+      if (tab.type === 'agent-session' || (tab.type === 'terminal' && isTabChatView(tab.id))) {
+        const identity = storedTabChatTranscriptIdentity(
+          hostId,
+          worktreeId,
+          tab,
+          nativeChatTranscriptIsLocalReadable
+        )
+        if (identity) {
+          void primeStoredChatTranscripts([identity])
+        }
+      }
       if (tab.type === 'terminal') {
         if (typeof tab.terminal === 'string') {
           if (
@@ -189,6 +207,9 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
     },
     [
       activeSessionTabId,
+      hostId,
+      isTabChatView,
+      nativeChatTranscriptIsLocalReadable,
       client,
       fileDocs,
       markdownDocs,

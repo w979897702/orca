@@ -12,6 +12,7 @@ import { translate } from '../../i18n/mobile-i18n'
 import { useMobileTranslation } from '../../i18n/use-mobile-translation'
 
 type Props = {
+  hostScope: string
   client: MobileFilePreviewRpcSender | null
   worktreeId: string
   documentPath: string
@@ -19,7 +20,14 @@ type Props = {
   alt: string
 }
 
-export function MobileMarkdownPreviewImage({ client, worktreeId, documentPath, href, alt }: Props) {
+export function MobileMarkdownPreviewImage({
+  hostScope,
+  client,
+  worktreeId,
+  documentPath,
+  href,
+  alt
+}: Props) {
   const colors = useMobileColors()
   const styles = useThemedStyles(stylesSheet)
   const t = useMobileTranslation()
@@ -29,7 +37,7 @@ export function MobileMarkdownPreviewImage({ client, worktreeId, documentPath, h
   const [expanded, setExpanded] = useState(false)
   useEffect(() => {
     let cancelled = false
-    void loadMarkdownPreviewImage(client, worktreeId, documentPath, href).then(
+    void loadMarkdownPreviewImage(client, worktreeId, documentPath, href, hostScope).then(
       (uri) => {
         if (!cancelled) {
           setLoad({ uri })
@@ -58,7 +66,7 @@ export function MobileMarkdownPreviewImage({ client, worktreeId, documentPath, h
     return () => {
       cancelled = true
     }
-  }, [client, worktreeId, documentPath, href, attempt])
+  }, [hostScope, client, worktreeId, documentPath, href, attempt])
 
   return (
     <View style={styles.frame}>

@@ -1,3 +1,4 @@
+import { formatOfflineAsOfTime } from '../components/host-connection/offline-as-of-time'
 import { useEffect, useState, useCallback } from 'react'
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -15,7 +16,7 @@ import { useRefreshHint } from '../query/refresh-hint'
 import { MobileAccountsLoadState } from './MobileAccountsLoadState'
 import { spacing } from '../theme/mobile-theme'
 import { useMobileColors } from '../theme/use-mobile-color-scheme'
-import { useMobileTranslation } from '../i18n/use-mobile-translation'
+import { useMobileTranslation, useMobileUiLocale } from '../i18n/use-mobile-translation'
 import { stylesSheet } from './mobile-accounts-screen-styles'
 import { useNow } from '../hooks/use-now'
 import { ClaudeIcon, OpenAIIcon } from '../components/icons/AgentIcons'
@@ -78,18 +79,19 @@ export function MobileAccountsScreen() {
   const [clockEnabled, setClockEnabled] = useState(false)
   const [notice, setNotice] = useState<AccountsNotice | null>(null)
 
+  const locale = useMobileUiLocale()
+  const now = useNow(60_000, clockEnabled)
   const accounts = useMobileAccountsSnapshot({
     hostId,
     client,
     connState,
-    lastConnectedAt: connectionInputs.lastConnectedAt
+    lastConnectedAt: connectionInputs.lastConnectedAt,
+    now
   })
   const { snapshot, live, refresh, refreshing, acceptSnapshot } = accounts
   const error = accounts.error ?? hostError
-  // Stored accounts stay up while connecting or offline; re-pair and a failed read on a live connection say so instead.
-  const showsAccounts =
-    snapshot !== null &&
-    (live || (connState !== 'auth-failed' && !(connState === 'connected' && error)))
+  // 断线或刷新失败可看上次读数，身份失效时隐藏。
+  const showsAccounts = snapshot !== null && connState !== 'auth-failed' && !hostError
   const offlineBanner = useHostOfflineBanner({
     client,
     connState,
@@ -99,7 +101,7 @@ export function MobileAccountsScreen() {
     hasData: showsAccounts,
     asOf: accounts.readAt
   })
-  // Stored accounts wait on the stream's first answer for their usage.
+  // 等待实时读数时仍标注正在刷新。
   const showRefreshLine = useRefreshHint(showsAccounts && !live && offlineBanner === null)
   const {
     supported: codexResetSupported,
@@ -125,8 +127,6 @@ export function MobileAccountsScreen() {
       return () => setClockEnabled(false)
     }, [])
   )
-  // Why: snapshot pushes only arrive when the desktop's rate-limit poll completes.
-  const now = useNow(60_000, clockEnabled)
 
   useEffect(() => {
     if (!hostId) {
@@ -370,6 +370,14 @@ export function MobileAccountsScreen() {
                 onRetry={offlineBanner.retry}
               />
             ) : null}
+            {!live && !offlineBanner && accounts.readAt !== null ? (
+              <Text style={styles.footerHintText}>
+                {t('components.hostOfflineBanner.asOf', 'As of {{time}}', {
+                  time: formatOfflineAsOfTime(accounts.readAt, t, locale)
+                })}
+              </Text>
+            ) : null}
+            {error ? <Text style={styles.footerHintText}>{error}</Text> : null}
             {renderProviderSection('claude')}
             {renderProviderSection('codex')}
             {renderOtherProviders()}
