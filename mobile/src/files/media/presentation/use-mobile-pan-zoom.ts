@@ -28,6 +28,7 @@ export type MobilePanZoom = {
     'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel'
   >
   /** Rendered pixels per content unit; 1 is actual size. */
+  pull: PanZoomPoint | null
   scale: number
   offset: PanZoomPoint | null
 }
@@ -41,7 +42,11 @@ function pinchOf(points: PanZoomPoint[]): Pinch {
 }
 
 /** Fit, pinch zoom at the fingers, drag to pan and double-tap to zoom, with pointer events so Android gets it too. */
-export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean): MobilePanZoom {
+export function useMobilePanZoom(
+  content: PanZoomSize | null,
+  upscale: boolean,
+  onDismiss?: () => void
+): MobilePanZoom {
   const [canvas, setCanvas] = useState<HTMLDivElement | null>(null)
   const [viewport, setViewport] = useState<PanZoomSize | null>(null)
   // null is the fitted view, so it follows the screen through rotation.
@@ -50,6 +55,11 @@ export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean):
   const pinch = useRef<Pinch | null>(null)
   const tap = useRef<{ start: PanZoomPoint; moved: boolean } | null>(null)
   const lastTap = useRef<Tap | null>(null)
+
+  const [pull, setPull] = useState<PanZoomPoint | null>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(closeTimer.current), [])
+  const fitted = (manualView?.zoom ?? 1) <= 1.01
 
   const [viewContent, setViewContent] = useState(content)
   if (viewContent?.width !== content?.width || viewContent?.height !== content?.height) {
@@ -122,14 +132,34 @@ export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean):
       })
     }
     const endPointer = (event: React.PointerEvent<HTMLDivElement>): void => {
-      pointers.current.delete(event.pointerId)
+      if (!pointers.current.delete(event.pointerId)) {
+        return
+      }
       pinch.current = pointers.current.size === 2 ? pinchOf([...pointers.current.values()]) : null
-      if (event.type !== 'pointerup' || pointers.current.size > 0 || !tap.current) {
+      if (event.type !== 'pointerup') {
+        tap.current = null
+        setPull(null)
+        return
+      }
+      if (pointers.current.size > 0 || !tap.current) {
         return
       }
       const { start, moved } = tap.current
       tap.current = null
-      if (moved || !geometry) {
+      const point = local(event)
+      const dx = point.x - start.x
+      const dy = point.y - start.y
+      if (onDismiss && fitted && dy > 120 && dy > 2 * Math.abs(dx)) {
+        onDismiss()
+        return
+      }
+      setPull(null)
+      if (moved || Math.hypot(dx, dy) > TAP_SLOP_PX) {
+        lastTap.current = null
+        return
+      }
+      if (!geometry) {
+        onDismiss?.()
         return
       }
       const now = event.timeStamp
@@ -144,15 +174,23 @@ export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean):
         return
       }
       lastTap.current = { at: now, point: start }
+      if (onDismiss) {
+        closeTimer.current = setTimeout(onDismiss, DOUBLE_TAP_MS)
+      }
     }
     return {
       onPointerDown: (event) => {
-        if (!geometry) {
+        if (event.button !== 0 || (!geometry && !onDismiss)) {
           return
         }
+        clearTimeout(closeTimer.current)
         event.currentTarget.setPointerCapture(event.pointerId)
         const point = local(event)
         pointers.current.set(event.pointerId, point)
+        if (pointers.current.size > 1) {
+          lastTap.current = null
+          setPull(null)
+        }
         tap.current = pointers.current.size === 1 ? { start: point, moved: false } : null
         pinch.current = pointers.current.size === 2 ? pinchOf([...pointers.current.values()]) : null
       },
@@ -192,6 +230,14 @@ export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean):
         if (pointers.current.size !== 1) {
           return
         }
+        if (onDismiss && fitted && tap.current) {
+          const x = point.x - tap.current.start.x
+          const y = point.y - tap.current.start.y
+          if (tap.current.moved) {
+            setPull({ x, y })
+          }
+          return
+        }
         const delta = { x: point.x - last.x, y: point.y - last.y }
         setManualView((current) => {
           const from = current
@@ -209,10 +255,11 @@ export function useMobilePanZoom(content: PanZoomSize | null, upscale: boolean):
       onPointerUp: endPointer,
       onPointerCancel: endPointer
     }
-  }, [geometry])
+  }, [geometry, fitted, onDismiss])
 
   const scale = geometry && view ? geometry.fitScale * view.zoom : 0
   return {
+    pull,
     setCanvas,
     handlers,
     scale,

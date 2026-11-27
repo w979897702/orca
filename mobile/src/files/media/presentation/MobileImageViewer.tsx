@@ -70,7 +70,14 @@ export function MobileImageViewer({
     <Modal visible transparent animationType="none" onRequestClose={close}>
       <Animated.View style={[styles.backdrop, style]}>
         <Animated.View style={[styles.stage, stageStyle]}>
-          <MobilePanZoomImage key={uri} uri={uri} label={label} size={size} upscale={upscale} />
+          <MobilePanZoomImage
+            key={uri}
+            uri={uri}
+            label={label}
+            size={size}
+            upscale={upscale}
+            onDismiss={close}
+          />
         </Animated.View>
         {onPrevious !== undefined || onNext !== undefined ? (
           <>
