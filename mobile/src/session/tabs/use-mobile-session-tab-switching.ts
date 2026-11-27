@@ -3,7 +3,8 @@ import {
   storedTabChatTranscriptIdentity
 } from '../native-chat/transcript/persistence/mobile-native-chat-transcript-store'
 import { keepsTerminalPaneVisible } from '../../terminal/session/pane-layout/mobile-terminal-pane-layout'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useWorkspaceExecutionHost } from '../../navigation/workspace-execution-host'
 import { STARTUP_CWD_FALLBACK_SENTENCE } from '../../../../src/shared/shell/launch/startup-cwd-fallback'
 import { triggerSelection } from '../../platform/haptics/haptics'
 import type { RpcResponse } from '../../transport/rpc/rpc-wire-types'
@@ -41,6 +42,9 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
     readFileTab,
     showToast
   } = scope
+  const executionHost = useWorkspaceExecutionHost()
+  const workspaceKey = JSON.stringify([hostId, executionHost, worktreeId])
+  const tabChoice = useMemo(() => ({ workspaceKey, explicit: false }), [workspaceKey])
   const reportActivation = useCallback(
     (response: RpcResponse) => {
       if (response.ok && activatedAtWorkspaceRoot(response.result)) {
@@ -52,6 +56,7 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
   // Why: unsubscribe restores old dims (clears phone-fit banner); resubscribe phone-fits the new one.
   const switchTab = useCallback(
     (handle: string) => {
+      tabChoice.explicit = true
       triggerSelection()
       const matchingTab = sessionTabs.find(
         (tab): tab is Extract<MobileSessionTab, { type: 'terminal' }> =>
@@ -104,12 +109,14 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
       setSplitTerminalHandles,
       subscribeToTerminal,
       unsubscribeTerminal,
+      tabChoice,
       worktreeId
     ]
   )
 
   const switchSessionTab = useCallback(
     (tab: MobileSessionTab, options?: { activate?: boolean }) => {
+      tabChoice.explicit = true
       if (isCachedActiveDocumentRetap(tab, activeSessionTabId, { markdownDocs, fileDocs })) {
         return
       }
@@ -218,11 +225,14 @@ export function useMobileSessionTabSwitching(scope: MobileSessionKeyboardStateMo
       reportActivation,
       switchTab,
       unsubscribeTerminal,
+      tabChoice,
       worktreeId
     ]
   )
   switchSessionTabRef.current = switchSessionTab
   return {
+    workspaceKey,
+    tabChoice,
     switchTab,
     switchSessionTab
   }

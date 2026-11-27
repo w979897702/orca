@@ -72,4 +72,5 @@ export function useNotificationPaneNavigation({
     worktreeId,
     openNativeSession
   ])
+  return request
 }
